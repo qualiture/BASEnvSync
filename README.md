@@ -13,7 +13,10 @@
 
 **TL;DR: Exports and imports SAP Business Application Studio environment settings**
 
-If you're a developer working with **[SAP Business Application Studio ("BAS")](https://www.sap.com/products/technology-platform/business-application-studio.html)**, chances are you are using its terminal a lot. Having worked with Linux, OS X and macOS for decades, I developed a habit of tweaking the terminal shell to my taste. Carefully crafted, heavily customized Bash prompts displaying Git branch status, execution times, autocomplete, command history, custom aliases, etc.
+If you're a developer working with **[SAP Business Application Studio ("BAS")](https://www.sap.com/products/technology-platform/business-application-studio.html)**, chances are you are using its terminal a lot. Having worked with Linux, OS X and macOS for decades, I developed a habit of tweaking the terminal shell to my taste. Carefully crafted, heavily customized Bash prompts displaying Git branch status, execution times, autocomplete, command history, custom aliases, etc:
+
+> ![Some fancy prompt](doc/fancyprompt.png)
+> *Imagine recreating prompts like this manually every time you create a new Dev Space...*
 
 If all this resonates with you, then this VSCode extension might just be for you as well.
 
@@ -35,9 +38,8 @@ This VSCode extension lets you export your environment settings from one Dev Spa
 
  - First, you need to install the BASEnvSync VSCode extension.
 
- - After installation, you have two new options in the Command Palette:
-     - Import BAS environment settings
-     - Export BAS environment settings
+ - After installation, you have two new options in the BAS Command Palette:
+    ![Commands](doc/commands.png)
 
 The next part will outline how to export and import your profile and settings.
 
