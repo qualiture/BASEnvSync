@@ -15,6 +15,7 @@
     "Business Technology Platform"
   ],
   "author": "Robin van het Hof (Qualiture)",
+  "publisher": "Qualiture",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/qualiture/BASEnvSync/issues"
