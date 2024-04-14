@@ -20,22 +20,16 @@ export default class Import {
 
         const zipfile = readFileSync(this.zipfile);
 
-        let processed = 0;
-
         this.zip.loadAsync(zipfile).then((files) => {
             files.forEach((filepath, index) => {
                 this.zip.file(filepath)?.async("nodebuffer").then((content) => {
                     const dest = `${this.homeDir}/${filepath}`;
                     console.log(`Unzipping ${dest}`);
                     outputFileSync(dest, content);
-
-                    processed++;
-
-                    if (processed === Object.keys(files.files).length) {
-                        vscode.window.showInformationMessage(`\nSucessfully mported BAS environment settings.`);
-                    }
                 });
             });
+
+            vscode.window.showInformationMessage(`\nSucessfully imported BAS environment settings.`);
         }).catch((err) => {
             vscode.window.showErrorMessage("Error importing BAS environmnet. Please check the logs.");
         });

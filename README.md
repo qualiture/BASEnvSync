@@ -41,6 +41,8 @@ This VSCode extension lets you export your environment settings from one Dev Spa
  - After installation, you have two new options in the BAS Command Palette:
     ![Commands](doc/commands.png)
 
+ - Because the exporting of the BAS profile (see next part) includes all the installed extensions, *there is no need to reinstall the extension on the new Dev Space*! Simply run the import and off you go!
+
 The next part will outline how to export and import your profile and settings.
 
 
@@ -51,7 +53,8 @@ Because this script **does not** export the BAS' `settings.json` file, you must 
 **From the source Dev Space:**
 
 - Click the "cogwheel" icon in the lower left, and select *Profiles* > *Export Profile...*
-- Follow the steps to export your BAS profile, and save it to your local harddisk
+- Follow the steps to export your BAS profile, and save it to your local harddisk.
+  Just make sure the `BASEnvSync` extension is included in the profile export 😎
 
 **From the target Dev Space:**
 

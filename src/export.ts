@@ -18,7 +18,8 @@ export default class Export {
         this.addToZip(".bashrc");
         this.addToZip(".bash_aliases");
         this.addToZip(".profile");
-        this.addToZip(".scripts");
+        this.addToZip(".scripts"); // folder with bash shell scripts (autocomplete, history, git prompt, etc)
+        this.addToZip(".tmp");     // here's where I store the CF defaultenv plugin
         this.addToZip(".npmrc");
         this.addToZip(".gitignore");
         this.addToZip(".gitconfig");
