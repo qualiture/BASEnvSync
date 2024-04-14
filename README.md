@@ -13,9 +13,9 @@
 
 **TL;DR: Exports and imports SAP Business Application Studio environment settings**
 
-If you're a developer working with **[SAP Business Application Studio ("BAS")](https://www.sap.com/products/technology-platform/business-application-studio.html)**, chances are you are using its terminal a lot. Having worked with Linux, OS X and macOS for decades, I developed a habit of tweaking the terminal shell to my taste. Heavily customized Bash prompts displaying Git branch status, execution times, autocomplete, command history, custom aliases, etc.
+If you're a developer working with **[SAP Business Application Studio ("BAS")](https://www.sap.com/products/technology-platform/business-application-studio.html)**, chances are you are using its terminal a lot. Having worked with Linux, OS X and macOS for decades, I developed a habit of tweaking the terminal shell to my taste. Carefully crafted, heavily customized Bash prompts displaying Git branch status, execution times, autocomplete, command history, custom aliases, etc.
 
-If all this resonates with you, then this NPM package might just be for you as well.
+If all this resonates with you, then this VSCode extension might just be for you as well.
 
 Many years ago, when working in multiple **SAP Business Application Studio** developer spaces simultaneously, I had quite the struggle to make sure all my spaces more or less had the same developer experience / look and feel. 
 
@@ -29,23 +29,15 @@ However, one day that script failed to work properly. It turned out, after an up
 
 Nevertheless, I still needed to find a way to tranfer other Dev Space settings, such as `.bashrc`, `.bash_aliases`, git settings, et al.
 
-This NPM package lets you export your environment settings from one Dev Space, and lets you import those settings in another Dev Space.
+This VSCode extension lets you export your environment settings from one Dev Space, and lets you import those settings in another Dev Space.
 
 ## How It Works
 
-First, you need to install the package in **both** the source Dev Space **and** the target Dev Space. I have found no way of having two Dev Spaces connect to each other (that might be a security issue, so makes sense) hence the 'double' install:
+ - First, you need to install the BASEnvSync VSCode extension.
 
-```bash
-$ npm install -g @qualiture/BASEnvSync
-```
-
-Then, you can execute the following to get a list of commandline parameters:
-
-```bash
-$ BASEnvSync -h
-# Or use the shorthand:
-$ bes -h
-```
+ - After installation, you have two new options in the Command Palette:
+     - Import BAS environment settings
+     - Export BAS environment settings
 
 The next part will outline how to export and import your profile and settings.
 
@@ -67,13 +59,9 @@ Because this script **does not** export the BAS' `settings.json` file, you must 
 
 ### 2) Exporting settings from source Dev Space
 
-- From a terminal, execute:
+- Open the Command Palette, and execute **Export BAS environment settings**
 
-    ```bash
-    $ BASEnvSync -x  # shorthand: bes -x
-    ```
-
-- A file `bas-env.zip` will be created in the current directory.
+- A file `bas-env.zip` will be created in the your `~/projects` directory.
 
     This ZIP file will contain -- if available in your Dev Space -- the following items:
 
@@ -93,14 +81,12 @@ Because this script **does not** export the BAS' `settings.json` file, you must 
 ### Importing settings to target Dev Space
 
 - Drag the downloaded `bas-env.zip` file into the Explorer.
-- From a terminal, navigate to the path where you stored the `bas-env.zip` file.
-- Execute the following command to import the settings:
 
-    ```bash
-    $ BASEnvSync -i bas-env.zip  # shorthand: bes -i bas-env.zip
-    ```
+- Open the Command Palette, and execute **Import BAS environment settings**
 
-- Restart BAS
+- A file dialog opens which lkets you select the uploaded `bas-env.zip` file.
+
+- After the settings have been loaded, open a new terminal and examine the applied changes.
 
 ## Roadmap
 
