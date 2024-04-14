@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/qualiture/BASEnvSync#readme",
   "engines": {
-    "vscode": "^1.88.0"
+    "vscode": "^1.80.0"
   },
   "categories": [
     "Other"
