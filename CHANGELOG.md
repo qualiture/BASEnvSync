@@ -1,8 +1,11 @@
 # Change Log
 
-All notable changes to the "BASEnvSync" VSCode extension will be documented in this file.
+All notable changes to the "BASEnvSync" SAP Business Application Studio extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.1.3]
+
+- Added logo
+- Improved stability and error handling
 
 ## [0.1.2]
 

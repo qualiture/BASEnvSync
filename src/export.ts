@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
-import { readFileSync, createWriteStream, lstatSync, readdirSync } from "fs";
+import { readFileSync, lstatSync, readdirSync } from "fs";
 import JSZip from "jszip";
 import os from 'os';
 
 import Constants from "./constants";
-import { buffer } from 'stream/consumers';
 
 export default class Export {
 
