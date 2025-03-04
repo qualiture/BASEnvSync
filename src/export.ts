@@ -23,6 +23,7 @@ export default class Export {
         this.addToZip(".gitignore");
         this.addToZip(".gitconfig");
         this.addToZip(".git-credentials");
+        this.addToZip(".inputrc");
 
         console.log("Running export");
 
@@ -37,6 +38,15 @@ export default class Export {
         });
     }
 
+    /**
+     * Adds a file or folder to the zip archive.
+     * If the specified path is a directory, it adds the entire folder to the zip.
+     * If the specified path is a file, it adds only that file to the zip.
+     * If the file or folder is not found, it logs a message and does not add it to the zip.
+     * 
+     * @param filename - The name of the file or folder to add to the zip.
+     * @param path - The optional path of the file or folder to add to the zip.
+     */
     private addToZip(filename: string, path?: string) {
         const fullPath = this.getFullPath(filename, path);
 

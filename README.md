@@ -77,6 +77,7 @@ Because this script **does not** export the BAS' `settings.json` file, you must 
     - `~/.gitignore`
     - `~/.gitconfig`
     - `~/.git-credentials`
+    - `~/.inputrc`
     - `~/.scripts` (folder)
 
     > NB: In most cases, you will notice the `~/.scripts` folder is skipped; I created that folder containing some shell scripts to enhance Bash (history, autocomplete, etc)
