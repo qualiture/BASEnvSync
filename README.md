@@ -5,9 +5,11 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-# BASEnvSync
+# BASEnvSync (extension for SAP BAS / SAP Build Code)
 
-![BASEnvSync](doc/bas.webp)
+| ![BASEnvSync](doc/bas.png) |
+|----|
+| *Transfer configuration files from one BAS workspace to another BAS workspace. Image was created with AI.* |
 
 ## About The Project
 
@@ -39,6 +41,7 @@ This VSCode extension lets you export your environment settings from one Dev Spa
  - First, you need to install the BASEnvSync VSCode extension.
 
  - After installation, you have two new options in the BAS Command Palette:
+
     ![Commands](doc/commands.png)
 
  - Because the exporting of the BAS profile (see next part) includes all the installed extensions, *there is no need to reinstall the extension on the new Dev Space*! Simply run the import and off you go!
@@ -66,7 +69,7 @@ Because this script **does not** export the BAS' `settings.json` file, you must 
 
 - Open the Command Palette, and execute **Export BAS environment settings**
 
-- A file `bas-env.zip` will be created in the your `~/projects` directory.
+- A file `bas-env.zip` will be created which you then download to your local harddisk.
 
     This ZIP file will contain -- if available in your Dev Space -- the following items:
 
@@ -82,15 +85,17 @@ Because this script **does not** export the BAS' `settings.json` file, you must 
 
     > NB: In most cases, you will notice the `~/.scripts` folder is skipped; I created that folder containing some shell scripts to enhance Bash (history, autocomplete, etc)
 
-- Download the `bas-env.zip` file to your local harddisk
-
 ### Importing settings to target Dev Space
-
-- Drag the downloaded `bas-env.zip` file into the Explorer.
 
 - Open the Command Palette, and execute **Import BAS environment settings**
 
-- A file dialog opens which lkets you select the uploaded `bas-env.zip` file.
+- After 1-2 seconds, a new tab will open which allows you to upload the `bas-env.zip` file (the file you have downloaded earlier) by clicking the **Select ZIP file to Upload** button:
+
+    ![Commands](doc/upload_step1.png)
+
+- When the initial upload of the `bas-env.zip` file was successful, click the **Transfer configuration to BAS** button:
+
+    ![Commands](doc/upload_step2.png)
 
 - After the settings have been loaded, open a new terminal and examine the applied changes.
 

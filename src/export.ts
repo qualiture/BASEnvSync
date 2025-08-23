@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { readFileSync, lstatSync, readdirSync } from "fs";
+import * as path from 'path';
+import { readFileSync, lstatSync, readdirSync, promises } from "fs";
 import JSZip from "jszip";
 import os from 'os';
 
@@ -27,15 +28,26 @@ export default class Export {
 
         console.log("Running export");
 
-        this.zip.generateAsync({ type: "nodebuffer", streamFiles:true }).then((buffer) => {
-            const destinationPath = this.homeDir + "/projects/";
-            const fullPath = vscode.Uri.file(destinationPath + Constants.DEFAULT_ZIP_FILE); // Convert File to Uri
-            vscode.workspace.fs.writeFile(fullPath, buffer);
-    
-            vscode.window.showInformationMessage(`\nExported '${Constants.DEFAULT_ZIP_FILE}' successfully to '${fullPath}'.\nFrom there you can download it locally.`);
+        this.zip.generateAsync({ type: "nodebuffer", streamFiles:true }).then(async (buffer) => {
+            await this.showSaveDialog(buffer);
         }).catch((error) => {
             vscode.window.showErrorMessage("Error exporting BAS environmnet. Please check the logs.");
         });
+    }
+
+    private async showSaveDialog(buffer: Buffer<ArrayBufferLike>) {
+        const uri = await vscode.window.showSaveDialog({
+            defaultUri: vscode.Uri.file(Constants.DEFAULT_ZIP_FILE),
+            filters: {
+                'ZIP files': ['zip'],
+                'All files': ['*']
+            }
+        });
+
+        if (uri) {
+            await promises.writeFile(uri.fsPath, buffer);
+            vscode.window.showInformationMessage(`Exported '${path.basename(uri.fsPath)}' successfully. From there you can upload it to your target environment.`);
+        }
     }
 
     /**

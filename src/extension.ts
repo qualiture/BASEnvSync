@@ -1,5 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 import * as vscode from 'vscode';
+import * as path from 'path';
+import { promises } from "fs";
 import Export from './export';
 import Import from './import';
 
@@ -42,23 +44,60 @@ function registerExportCommand(context: vscode.ExtensionContext) {
  * @param context 
  */
 function registerImportCommand(context: vscode.ExtensionContext) {
-	let importCommand = vscode.commands.registerCommand('basenvsync.import', () => {
+	let importCommand = vscode.commands.registerCommand('basenvsync.import', async () => {
 		console.log("Importing BAS environment...");
 
-		vscode.window.showOpenDialog({
-			canSelectFiles: true,
-			canSelectFolders: false,
-			canSelectMany: false,
-			openLabel: "Select the BAS environment zip file to import",
-			filters: {
-				"Zip Files": ["zip"]
+		const panel = vscode.window.createWebviewPanel(
+			'fileUpload',
+			'Upload File',
+			vscode.ViewColumn.One,
+			{
+				enableScripts: true,
+				retainContextWhenHidden: true
 			}
-		}).then((fileUri) => {
-			if (fileUri && fileUri.length > 0) {
-				const importEnv = new Import(fileUri[0].fsPath);
-				importEnv.run();
-			}
-		});
+		);
+	
+		try {
+			const htmlPath = path.join(context.extensionPath, 'src', 'webviews', 'upload.html');
+			const html = await promises.readFile(htmlPath, 'utf8');
+			panel.webview.html = html;
+		} catch (error) {
+			console.error('Failed to load \'upload.html\' with error:', error);
+		}
+		
+		// Handle messages from webview
+		panel.webview.onDidReceiveMessage(
+			async message => {
+				switch (message.command) {
+					case 'fileUploaded':
+						const importEnv = new Import(message.filePath, message.content);
+						importEnv.run();
+						// await handleUploadedFile(message.content, message.fileName);
+						panel.dispose();
+						break;
+					case 'uploadError':
+						vscode.window.showErrorMessage(`Upload error: ${message.error}`);
+						break;
+				}
+			},
+			undefined,
+			context.subscriptions
+		);
+
+		// vscode.window.showOpenDialog({
+		// 	canSelectFiles: true,
+		// 	canSelectFolders: false,
+		// 	canSelectMany: false,
+		// 	openLabel: "Select the BAS environment zip file to import",
+		// 	filters: {
+		// 		"Zip Files": ["zip"]
+		// 	}
+		// }).then((fileUri) => {
+		// 	if (fileUri && fileUri.length > 0) {
+		// 		const importEnv = new Import(fileUri[0].fsPath);
+		// 		importEnv.run();
+		// 	}
+		// });
 	});
 	
 	context.subscriptions.push(importCommand);

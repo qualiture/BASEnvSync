@@ -1,0 +1,255 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Upload SAP BAS Configuration</title>
+        <style>
+            body { 
+                font-family: var(--vscode-font-family);
+                padding: 20px;
+                background-color: var(--vscode-editor-background);
+                color: var(--vscode-editor-foreground);
+            }
+            input[type="file"] {
+                display: none;
+            }
+            .upload-button {
+                background-color: var(--vscode-button-background);
+                color: var(--vscode-button-foreground);
+                border: none;
+                padding: 15px 30px;
+                cursor: pointer;
+                border-radius: 3px;
+                font-size: 16px;
+                margin: 20px 0;
+                display: inline-block;
+                transition: background-color 0.3s;
+            }
+            .upload-button:hover {
+                background-color: var(--vscode-button-hoverBackground);
+            }
+            .upload-button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            button {
+                background-color: var(--vscode-button-background);
+                color: var(--vscode-button-foreground);
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                border-radius: 3px;
+                font-size: 14px;
+                margin: 10px 5px;
+            }
+            button:hover {
+                background-color: var(--vscode-button-hoverBackground);
+            }
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+            .file-info {
+                margin: 20px 0;
+                padding: 15px;
+                background-color: var(--vscode-textBlockQuote-background);
+                border-left: 3px solid var(--vscode-textBlockQuote-border);
+                display: none;
+            }
+            .upload-section {
+                text-align: center;
+                margin: 30px 0;
+                padding: 20px;
+                border: 1px solid var(--vscode-panel-border);
+                border-radius: 5px;
+                background-color: var(--vscode-editor-inactiveSelectionBackground);
+            }
+            .supported-formats {
+                margin-top: 15px;
+                font-size: 12px;
+                color: var(--vscode-descriptionForeground);
+            }
+            .status {
+                margin: 15px 0;
+                padding: 10px;
+                border-radius: 3px;
+                display: none;
+            }
+            .status.success {
+                background-color: var(--vscode-testing-iconPassed);
+                color: white;
+            }
+            .status.error {
+                background-color: var(--vscode-errorForeground);
+                color: white;
+            }
+            strong.warning-content {
+                margin: 0 0 10px 0;
+                color: var(--vscode-editorWarning-foreground);
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <h3>Upload SAP BAS Configuration</h3>
+        
+        <div class="upload-section">
+            <p>Select an SAP BAS configuration ZIP file ("bas-env.zip") from your computer to upload to BAS</p>
+            <button class="upload-button" id="selectFileBtn" onclick="document.getElementById('fileInput').click()">
+                📁 Select ZIP File to Upload
+            </button>
+            <div class="supported-formats">
+                <strong>Supported formats:</strong> *.zip files
+            </div>
+        </div>
+        
+        <input type="file" id="fileInput" accept=".zip">
+        
+        <div id="status" class="status"></div>
+        
+        <div class="file-info" id="fileInfo">
+            <h4>📄 Selected File:</h4>
+            <p><strong>Name:</strong> <span id="fileName"></span></p>
+            <p><strong>Size:</strong> <span id="fileSize"></span></p>
+            <p><strong>Type:</strong> <span id="fileType"></span></p>
+            <div style="margin-top: 15px;">
+                <button id="uploadBtn" onclick="uploadFile()">🚀 Transfer configuration to BAS</button>
+                <button onclick="clearFile()">🗑️ Clear Selection</button>
+            </div>
+            <p><strong class="warning-content">If you continue, it will overwrite existing configuration files with the ones in the ZIP file!</strong> This action cannot be undone</p>
+        </div>
+
+        <script>
+            const vscode = acquireVsCodeApi();
+            let selectedFile = null;
+            
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const fileType = document.getElementById('fileType');
+            const selectFileBtn = document.getElementById('selectFileBtn');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const statusDiv = document.getElementById('status');
+            
+            // Prevent default drag behaviors on the entire document to avoid file replacement
+            document.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            
+            document.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Don't handle drop - force users to use the file button
+                showStatus('Please use the "Select ZIP File to Upload" button to choose your file.', 'error');
+            });
+            
+            // File input handler
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+            
+            function showStatus(message, type = 'success') {
+                statusDiv.textContent = message;
+                statusDiv.className = `status ${type}`;
+                statusDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    if (type === 'success') {
+                        statusDiv.style.display = 'none';
+                    }
+                }, 3000);
+            }
+            
+            function handleFile(file) {
+                // Validate file size (limit to 10MB)
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                    showStatus('File is too large. Please select a file smaller than 10MB.', 'error');
+                    return;
+                }
+                
+                selectedFile = file;
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileType.textContent = file.type || 'Unknown';
+                
+                fileInfo.style.display = 'block';
+                selectFileBtn.textContent = '📁 Change File Selection';
+                
+                showStatus(`File "${file.name}" selected successfully!`, 'success');
+            }
+            
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            function uploadFile() {
+                if (!selectedFile) {
+                    showStatus('Please select a file first.', 'error');
+                    return;
+                }
+                
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '⏳ Uploading...';
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        // Convert to base64 for safe transmission
+                        const content = btoa(e.target.result);
+                        
+                        vscode.postMessage({
+                            command: 'fileUploaded',
+                            content: content,
+                            fileName: selectedFile.name
+                        });
+                        
+                        showStatus('File uploaded successfully!', 'success');
+                        
+                    } catch (error) {
+                        showStatus(`Upload failed: ${error.message}`, 'error');
+                        uploadBtn.disabled = false;
+                        uploadBtn.textContent = '🚀 Transfer configuration to BAS';
+                        
+                        vscode.postMessage({
+                            command: 'uploadError',
+                            error: error.message
+                        });
+                    }
+                };
+                
+                reader.onerror = function() {
+                    showStatus('Failed to read the selected file.', 'error');
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '🚀 Transfer configuration to BAS';
+                    
+                    vscode.postMessage({
+                        command: 'uploadError',
+                        error: 'Failed to read file'
+                    });
+                };
+                
+                reader.readAsBinaryString(selectedFile);
+            }
+            
+            function clearFile() {
+                selectedFile = null;
+                fileInput.value = '';
+                fileInfo.style.display = 'none';
+                selectFileBtn.textContent = '📁 Select ZIP File to Upload';
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '🚀 Transfer configuration to BAS';
+                statusDiv.style.display = 'none';
+            }
+        </script>
+    </body>
+    </html>

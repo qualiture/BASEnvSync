@@ -2,6 +2,12 @@
 
 All notable changes to the "BASEnvSync" SAP Business Application Studio extension will be documented in this file.
 
+## [1.0.1]
+
+- First major version
+- Significant overhaul of the download and upload flow for the configuration ZIP file
+- Updated packages
+
 ## [0.2.0]
 
 - Added `.inputrc` to exported files

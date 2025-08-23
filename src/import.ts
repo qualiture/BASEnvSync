@@ -7,20 +7,24 @@ import os from 'os';
 export default class Import {
 
     protected zipfile: string;
+    private zipContent: string;
 
     private homeDir: string = "";
     private zip = new JSZip();
 
-    constructor(zipfile: string) {
+    constructor(zipfile: string, zipContent: string) {
         this.zipfile = zipfile;
+        this.zipContent = zipContent;
     }
 
     public run() {
+        const decodedContent = Buffer.from(this.zipContent, 'base64');//.toString('utf8');
+        // const zipfile: Buffer = Buffer.from(decodedContent, 'utf8');
         this.homeDir = os.homedir();
 
-        const zipfile = readFileSync(this.zipfile);
+        // const zipfile = readFileSync(this.zipfile);
 
-        this.zip.loadAsync(zipfile).then((files) => {
+        this.zip.loadAsync(decodedContent).then((files) => {
             // Rudimentary check to see if the zip file contains the expected files
             if (!files.files[".bashrc"]) {
                 vscode.window.showErrorMessage("Error importing BAS environment. This does not appear to be a valid BAS environment zip file.");
