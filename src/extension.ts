@@ -58,7 +58,7 @@ function registerImportCommand(context: vscode.ExtensionContext) {
 		);
 	
 		try {
-			const htmlPath = path.join(context.extensionPath, 'src', 'webviews', 'upload.html');
+			const htmlPath = path.join(context.extensionPath, 'out', 'webviews', 'upload.html');
 			const html = await promises.readFile(htmlPath, 'utf8');
 			panel.webview.html = html;
 		} catch (error) {

@@ -71,6 +71,9 @@ Because this script **does not** export the BAS' `settings.json` file, you must 
 
 - A file `bas-env.zip` will be created which you then download to your local harddisk.
 
+    > NB: If you run SAP BAS / SAP Build Code from a browser (as most of us would), you cannot save the file to your local harddisk directly. Choose a path inside your project folder to save the file, and then right-click from the **Project Explorer** and from the context menu, choose **Download**.
+    > However, if you run SAP BAS / SAP Builkd Code inside VS Code via the Remote Development Extension, you will get the standard VS Code 'Save As' dialog which lets you save to your local harddisk directly.
+
     This ZIP file will contain -- if available in your Dev Space -- the following items:
 
     - `~/.bashrc`

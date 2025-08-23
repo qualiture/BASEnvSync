@@ -2,6 +2,11 @@
 
 All notable changes to the "BASEnvSync" SAP Business Application Studio extension will be documented in this file.
 
+## [1.0.2]
+
+- Fixes: Blocking bug in presenting webview for upload
+- Updated documentation
+
 ## [1.0.1]
 
 - First major version
