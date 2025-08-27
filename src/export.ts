@@ -25,6 +25,10 @@ export default class Export {
     }
 
     public async run() {
+        const notesUri = vscode.Uri.joinPath(this.context.extensionUri, 'CHANGELOG.md');
+
+        this.logger.info('See changelog at:', notesUri);
+
         const method = await this.getDownloadMethod();
 
         if (!method) return;
