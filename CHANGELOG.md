@@ -2,6 +2,10 @@
 
 All notable changes to the "BASEnvSync" SAP Business Application Studio extension will be documented in this file.
 
+## [1.1.0]
+
+- New: Implemented display of 'What's New' tab on updated extension
+
 ## [1.0.2]
 
 - Fixes: Blocking bug in presenting webview for upload
