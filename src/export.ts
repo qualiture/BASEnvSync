@@ -92,7 +92,7 @@ export default class Export {
 
         // Load HTML from file
         try {
-            const htmlPath = path.join(context.extensionPath, 'src', 'webviews', 'download.html');
+            const htmlPath = path.join(context.extensionPath, 'out', 'webviews', 'download.html');
             let html = await promises.readFile(htmlPath, 'utf8');
             
             // Replace placeholders with actual values

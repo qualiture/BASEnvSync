@@ -3,7 +3,7 @@
   "displayName": "BASEnvSync",
   "description": "Utility to export/import SAP Business Application Studio dev space settings and configuration",
   "icon": "doc/logo.png",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/qualiture/BASEnvSync.git"
