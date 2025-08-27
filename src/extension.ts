@@ -40,6 +40,7 @@ async function showWhatsNew(context: vscode.ExtensionContext) {
     if (prevVersion && prevVersion !== thisVersion) {
         // Resolve CHANGELOG.md inside your extension bundle
         const notesUri = vscode.Uri.joinPath(context.extensionUri, RELEASE_NOTES_MD);
+		logger.info('Release notes URL:', notesUri);
 
         // Either open the raw Markdown…
         // const doc = await vscode.workspace.openTextDocument(notesUri);

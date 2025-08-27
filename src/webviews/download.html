@@ -97,17 +97,21 @@
         
         function downloadFile() {
             try {
+                console.info('[BASEnvSync] Starting download...');
                 const downloadBtn = document.getElementById('downloadBtn');
                 downloadBtn.disabled = true;
                 downloadBtn.textContent = 'Downloading...';
                 
                 // Decode base64 content
                 const content = atob(encodedContent);
+                console.info('[BASEnvSync] Content encoded');
                 
                 // Create blob and download
                 const blob = new Blob([content], { type: 'application/zip' });
                 const url = URL.createObjectURL(blob);
                 
+                console.info('[BASEnvSync] ObjectURL:', url);
+
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = fileName;
