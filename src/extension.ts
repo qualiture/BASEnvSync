@@ -6,7 +6,7 @@ import Export from './export';
 import Import from './import';
 
 const EXTENSION_VERSION = 'basenvsync.version';    // key in globalState
-const RELEASE_NOTES_MD  = 'CHANGELOG.md';          // ship this file with your .vsix
+const RELEASE_NOTES_MD  = 'changelog.md';          // ship this file with your .vsix
 const logger = vscode.window.createOutputChannel("BASEnvSync", { log: true });
 
 /**

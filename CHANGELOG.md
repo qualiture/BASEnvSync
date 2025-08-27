@@ -2,6 +2,16 @@
 
 All notable changes to the "BASEnvSync" SAP Business Application Studio extension will be documented in this file.
 
+## [1.1.5]
+
+- Found no solution for download flow. Behavior now is the following: 
+   - SAP BAS / SAP Build Code: Downloads to workspace (choose your project root from the file picker dialog)
+   - VS Code: Downloads to local harddisk 
+
+## [1.1.1 - 1.1.4]
+
+- Tried various attempts at streamlining the download functionality.
+
 ## [1.1.0]
 
 - New: Implemented display of 'What's New' tab on updated extension

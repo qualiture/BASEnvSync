@@ -62,13 +62,14 @@ export default class Export {
         return await vscode.window.showQuickPick([
             {
                 label: '💾 Save with Dialog',
-                description: 'Recommended when using VS Code',
+                // description: 'Recommended when using VS Code',
+                description: 'Save to workspace (BAS, Build Code) or local harddisk (VS Code)',
                 detail: 'Choose exact location where to save the file'
-            },
-            {
-                label: '⬇️ Browser Download (Beta functionality)',
-                description: 'Recommended when using browser',
-                detail: 'File goes to your Downloads folder'
+            // },
+            // {
+            //     label: '⬇️ Browser Download (Beta functionality)',
+            //     description: 'Recommended when using browser',
+            //     detail: 'File goes to your Downloads folder'
             }
         ], {
             placeHolder: 'Choose how to download the file'
