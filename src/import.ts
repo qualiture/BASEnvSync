@@ -8,13 +8,15 @@ export default class Import {
 
     protected zipfile: string;
     private zipContent: string;
+    private logger: vscode.LogOutputChannel;
 
     private homeDir: string = "";
     private zip = new JSZip();
 
-    constructor(zipfile: string, zipContent: string) {
+    constructor(zipfile: string, zipContent: string, logger: vscode.LogOutputChannel) {
         this.zipfile = zipfile;
         this.zipContent = zipContent;
+        this.logger = logger;
     }
 
     public run() {
@@ -41,6 +43,7 @@ export default class Import {
                 vscode.window.showInformationMessage(`Sucessfully imported BAS environment settings.`);
             }
         }).catch((err) => {
+            this.logger.error('Failed to import BAS environment with error:', err);
             vscode.window.showErrorMessage("Error importing BAS environmnet. Please check the logs.");
         });
     }

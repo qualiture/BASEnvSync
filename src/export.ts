@@ -6,12 +6,29 @@ import os from 'os';
 
 import Constants from "./constants";
 
+type ExportMethod = {
+    label: string;
+    description: string;
+    detail: string;
+};
+
 export default class Export {
 
     private homeDir: string = "";
     private zip = new JSZip();
+    private context: vscode.ExtensionContext;
+    private logger: vscode.LogOutputChannel;
 
-    public run() {
+    constructor(context: vscode.ExtensionContext, logger: vscode.LogOutputChannel) {
+        this.context = context;
+        this.logger = logger;
+    }
+
+    public async run() {
+        const method = await this.getDownloadMethod();
+
+        if (!method) return;
+
         this.homeDir = os.homedir();
 
         // TODO: Make this more flexible 
@@ -29,10 +46,82 @@ export default class Export {
         console.log("Running export");
 
         this.zip.generateAsync({ type: "nodebuffer", streamFiles:true }).then(async (buffer) => {
-            await this.showSaveDialog(buffer);
+            // await this.showSaveDialog(buffer);
+            await this.handleDownload(method, this.context, buffer);
         }).catch((error) => {
+            this.logger.error(`Failed to export BAS environment with error: ${error}`);
             vscode.window.showErrorMessage("Error exporting BAS environmnet. Please check the logs.");
         });
+    }
+
+    private async getDownloadMethod() : Promise<ExportMethod | undefined> {
+        return await vscode.window.showQuickPick([
+            {
+                label: '💾 Save with Dialog',
+                description: 'Recommended when using VS Code',
+                detail: 'Choose exact location where to save the file'
+            },
+            {
+                label: '⬇️ Browser Download (Beta functionality)',
+                description: 'Recommended when using browser',
+                detail: 'File goes to your Downloads folder'
+            }
+        ], {
+            placeHolder: 'Choose how to download the file'
+        });
+    }
+
+    private async handleDownload(method: ExportMethod , context: vscode.ExtensionContext, buffer: Buffer<ArrayBufferLike>) {
+        if (method.label.includes('Save with Dialog')) {
+            this.showSaveDialog(buffer);
+        } else {
+            this.downloadViaWebView(context, buffer);
+        }
+    }
+
+    private async downloadViaWebView(context: vscode.ExtensionContext, buffer: Buffer<ArrayBufferLike>) {
+        const panel = vscode.window.createWebviewPanel(
+            'fileDownload',
+            'Download File',
+            vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true
+            }
+        );
+
+        // Load HTML from file
+        try {
+            const htmlPath = path.join(context.extensionPath, 'src', 'webviews', 'download.html');
+            let html = await promises.readFile(htmlPath, 'utf8');
+            
+            // Replace placeholders with actual values
+            const encodedContent = Buffer.from(buffer).toString('base64');
+            html = html.replace(/\{\{FILENAME\}\}/g, Constants.DEFAULT_ZIP_FILE);
+            html = html.replace(/\{\{ENCODED_CONTENT\}\}/g, encodedContent);
+            
+            panel.webview.html = html;
+        } catch (error) {
+            this.logger.error('Failed to load download.html with error:', error);
+            vscode.window.showErrorMessage("Failed to load download.html. Use a different method instead.");
+        }
+
+        // Handle messages from webview
+        panel.webview.onDidReceiveMessage(
+            message => {
+                switch (message.command) {
+                    case 'downloadComplete':
+                        vscode.window.showInformationMessage('File downloaded successfully!');
+                        // panel.dispose();
+                        break;
+                    case 'downloadError':
+                        vscode.window.showErrorMessage(`Download error: ${message.error}`);
+                        break;
+                }
+            },
+            undefined,
+            context.subscriptions
+        );
     }
 
     private async showSaveDialog(buffer: Buffer<ArrayBufferLike>) {

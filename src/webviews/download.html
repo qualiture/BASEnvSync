@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download File</title>
+    <style>
+        body { 
+            font-family: var(--vscode-font-family);
+            padding: 20px;
+            background-color: var(--vscode-editor-background);
+            color: var(--vscode-editor-foreground);
+        }
+        button {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: var(--vscode-textBlockQuote-background);
+            border-left: 3px solid var(--vscode-textBlockQuote-border);
+        }
+        .status {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 3px;
+            display: none;
+        }
+        .status.success {
+            background-color: var(--vscode-testing-iconPassed);
+            color: white;
+        }
+        .status.warning {
+            background-color: var(--vscode-editorWarning-foreground);
+            color: white;
+        }
+        .download-info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--vscode-editor-inactiveSelectionBackground);
+            border-radius: 3px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h3>Download BAS configuration</h3>
+        <p>Click the button below to download: <strong id="fileName">{{FILENAME}}</strong></p>
+        <p><strong>⚠️ Beta functionality!</strong> This feature is still in development and may not work as expected. If you experience any issues, please use the 'Save with dialog' export method instead.</p>
+    </div>
+    
+    <button id="downloadBtn" onclick="downloadFile()">Download File</button>
+    
+    <div id="status" class="status"></div>
+    
+    <div class="download-info">
+        <h4>📁 Where to find your downloaded file:</h4>
+        <ul>
+            <li><strong>Windows:</strong> Usually in your Downloads folder (C:\Users\YourName\Downloads\)</li>
+            <li><strong>Mac:</strong> Usually in your Downloads folder (~/Downloads/)</li>
+            <li><strong>Linux:</strong> Usually in your Downloads folder (~/Downloads/)</li>
+            <li><strong>Browser-based:</strong> Check your browser's download location in settings</li>
+        </ul>
+        <p><em>💡 Tip: Check your browser's download notification or press Ctrl+Shift+J (Cmd+Shift+J on Mac) to see browser downloads</em></p>
+    </div>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+        const encodedContent = '{{ENCODED_CONTENT}}';
+        const fileName = '{{FILENAME}}';
+        
+        function showStatus(message, type = 'success') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function downloadFile() {
+            try {
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.disabled = true;
+                downloadBtn.textContent = 'Downloading...';
+                
+                // Decode base64 content
+                const content = atob(encodedContent);
+                
+                // Create blob and download
+                const blob = new Blob([content], { type: 'application/zip' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                
+                // Force click
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                showStatus('✅ Download initiated! Check your Downloads folder or browser download notifications.', 'success');
+                
+                setTimeout(() => {
+                    downloadBtn.disabled = false;
+                    downloadBtn.textContent = 'Download Again';
+                }, 2000);
+                
+                vscode.postMessage({
+                    command: 'downloadComplete'
+                });
+            } catch (error) {
+                showStatus('❌ Download failed: ' + error.message, 'warning');
+                
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.disabled = false;
+                downloadBtn.textContent = 'Download File';
+                
+                vscode.postMessage({
+                    command: 'downloadError',
+                    error: error.message
+                });
+            }
+        }
+        
+        // Show helpful info on load
+        window.addEventListener('load', () => {
+            showStatus('ℹ️ Ready to download. The file will go to your browser\'s default download location.', 'success');
+        });
+    </script>
+</body>
+</html>

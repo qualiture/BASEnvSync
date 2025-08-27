@@ -7,6 +7,7 @@ import Import from './import';
 
 const EXTENSION_VERSION = 'basenvsync.version';    // key in globalState
 const RELEASE_NOTES_MD  = 'CHANGELOG.md';          // ship this file with your .vsix
+const logger = vscode.window.createOutputChannel("BASEnvSync", { log: true });
 
 /**
  * This method is called when your extension is activated
@@ -14,7 +15,8 @@ const RELEASE_NOTES_MD  = 'CHANGELOG.md';          // ship this file with your .
  * @param context 
  */
 export async function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "basenvsync" is now active!');
+
+	logger.info('Extension "BASEnvSync" is now active!');
 
 	await showWhatsNew(context);
 
@@ -58,9 +60,9 @@ async function showWhatsNew(context: vscode.ExtensionContext) {
  */
 function registerExportCommand(context: vscode.ExtensionContext) {
 	let exportCommand = vscode.commands.registerCommand('basenvsync.export', () => {
-		console.log("Exporting BAS environment...");
+		logger.info("Exporting BAS environment...");
 
-		const exportEnv = new Export();
+		const exportEnv = new Export(context, logger);
         
         exportEnv.run();
 	});
@@ -74,7 +76,7 @@ function registerExportCommand(context: vscode.ExtensionContext) {
  */
 function registerImportCommand(context: vscode.ExtensionContext) {
 	let importCommand = vscode.commands.registerCommand('basenvsync.import', async () => {
-		console.log("Importing BAS environment...");
+		logger.info("Importing BAS environment...");
 
 		const panel = vscode.window.createWebviewPanel(
 			'fileUpload',
@@ -91,7 +93,7 @@ function registerImportCommand(context: vscode.ExtensionContext) {
 			const html = await promises.readFile(htmlPath, 'utf8');
 			panel.webview.html = html;
 		} catch (error) {
-			console.error('Failed to load \'upload.html\' with error:', error);
+			logger.error('Failed to load \'upload.html\' with error:', error);
 		}
 		
 		// Handle messages from webview
@@ -99,7 +101,7 @@ function registerImportCommand(context: vscode.ExtensionContext) {
 			async message => {
 				switch (message.command) {
 					case 'fileUploaded':
-						const importEnv = new Import(message.filePath, message.content);
+						const importEnv = new Import(message.filePath, message.content, logger);
 						importEnv.run();
 						// await handleUploadedFile(message.content, message.fileName);
 						panel.dispose();
@@ -112,21 +114,6 @@ function registerImportCommand(context: vscode.ExtensionContext) {
 			undefined,
 			context.subscriptions
 		);
-
-		// vscode.window.showOpenDialog({
-		// 	canSelectFiles: true,
-		// 	canSelectFolders: false,
-		// 	canSelectMany: false,
-		// 	openLabel: "Select the BAS environment zip file to import",
-		// 	filters: {
-		// 		"Zip Files": ["zip"]
-		// 	}
-		// }).then((fileUri) => {
-		// 	if (fileUri && fileUri.length > 0) {
-		// 		const importEnv = new Import(fileUri[0].fsPath);
-		// 		importEnv.run();
-		// 	}
-		// });
 	});
 	
 	context.subscriptions.push(importCommand);
