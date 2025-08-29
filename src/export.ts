@@ -25,10 +25,6 @@ export default class Export {
     }
 
     public async run() {
-        const notesUri = vscode.Uri.joinPath(this.context.extensionUri, 'CHANGELOG.md');
-
-        this.logger.info('See changelog at:', notesUri);
-
         const method = await this.getDownloadMethod();
 
         if (!method) return;
@@ -47,7 +43,7 @@ export default class Export {
         this.addToZip(".git-credentials");
         this.addToZip(".inputrc");
 
-        console.log("Running export");
+        this.logger.info("Running export...");
 
         this.zip.generateAsync({ type: "nodebuffer", streamFiles:true }).then(async (buffer) => {
             // await this.showSaveDialog(buffer);
@@ -65,11 +61,11 @@ export default class Export {
                 // description: 'Recommended when using VS Code',
                 description: 'Save to workspace (BAS, Build Code) or local harddisk (VS Code)',
                 detail: 'Choose exact location where to save the file'
-            // },
-            // {
-            //     label: '⬇️ Browser Download (Beta functionality)',
-            //     description: 'Recommended when using browser',
-            //     detail: 'File goes to your Downloads folder'
+            },
+            {
+                label: '⬇️ Browser Download (Chrome / Edge only!)',
+                description: 'Recommended when using Chrome or Edge',
+                detail: 'File goes to your Downloads folder'
             }
         ], {
             placeHolder: 'Choose how to download the file'
@@ -165,7 +161,7 @@ export default class Export {
                 this.addSingleFileToZip(filename, path);
             }
         } catch (error) {
-            console.log(`File or folder '${filename}' not found and will not be exported`);
+            this.logger.warn(`File or folder '${filename}' not found in workspace and will not be exported`);
         }
     }
 
@@ -180,7 +176,7 @@ export default class Export {
             zipfolder?.file(filename, file);
         }
 
-        console.log(`Folder '${folder}' added to zip, containing ${filenames.length} files.`);
+        this.logger.info(`Folder '${folder}' added to zip, containing ${filenames.length} files.`);
     }
 
     private addSingleFileToZip(filename: string, path?: string) {
@@ -195,7 +191,7 @@ export default class Export {
             this.zip.file(filename, file);
         }
 
-        console.log(`File '${filename}' added to zip.`);
+        this.logger.info(`File '${filename}' added to zip.`);
     }
 
     private getFullPath(filename: string, path?: string) : string {

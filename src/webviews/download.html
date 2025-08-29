@@ -62,6 +62,8 @@
         <h3>Download BAS configuration</h3>
         <p>Click the button below to download: <strong id="fileName">{{FILENAME}}</strong></p>
         <p><strong>⚠️ Beta functionality!</strong> This feature is still in development and may not work as expected. If you experience any issues, please use the 'Save with dialog' export method instead.</p>
+        <p><em>Note: This feature works best in Chrome or Edge browsers. Other browsers may not support the required APIs.</em></p>
+        <p><em>Also, make sure you run SAP BAS / SAP Build Code from the following URL: <strong id="sapBASUrl"></strong></em></p>
     </div>
     
     <button id="downloadBtn" onclick="downloadFile()">Download File</button>
@@ -83,7 +85,12 @@
         const vscode = acquireVsCodeApi();
         const encodedContent = '{{ENCODED_CONTENT}}';
         const fileName = '{{FILENAME}}';
-        
+
+        function showSAPBASUrl() {
+            const sapBASUrl = document.getElementById('sapBASUrl');
+            sapBASUrl.textContent = window.location.origin;
+        }
+
         function showStatus(message, type = 'success') {
             const statusDiv = document.getElementById('status');
             statusDiv.textContent = message;
@@ -95,7 +102,7 @@
             }, 5000);
         }
         
-        function downloadFile() {
+        async function downloadFile() {
             try {
                 console.info('[BASEnvSync] Starting download...');
                 const downloadBtn = document.getElementById('downloadBtn');
@@ -108,24 +115,45 @@
                 
                 // Create blob and download
                 const blob = new Blob([content], { type: 'application/zip' });
-                const url = URL.createObjectURL(blob);
-                
-                console.info('[BASEnvSync] ObjectURL:', url);
 
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                
-                // Force click
-                a.click();
-                
-                // Cleanup
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
+                const supportsFileSystemAccess = 'showOpenFilePicker' in window;
+
+                if (supportsFileSystemAccess) {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: fileName,
+                        types: [{
+                            description: 'ZIP Files',
+                            accept: {
+                                'application/zip': ['.zip']
+                            }
+                        }]
+                    });
+
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+
+                    console.info('[BASEnvSync] File saved to:', handle.name);
+                } else {
+                    const url = URL.createObjectURL(blob);
+
+                    console.info('[BASEnvSync] ObjectURL:', url);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    
+                    // Force click
+                    a.click();
+                    
+                    // Cleanup
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                }
                 
                 showStatus('✅ Download initiated! Check your Downloads folder or browser download notifications.', 'success');
                 
@@ -154,6 +182,7 @@
         // Show helpful info on load
         window.addEventListener('load', () => {
             showStatus('ℹ️ Ready to download. The file will go to your browser\'s default download location.', 'success');
+            showSAPBASUrl();
         });
     </script>
 </body>

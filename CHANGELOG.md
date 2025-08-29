@@ -2,6 +2,12 @@
 
 All notable changes to the "BASEnvSync" SAP Business Application Studio extension will be documented in this file.
 
+## [1.2.0]
+
+- New: 🥳 Finally managed to get the 'Save As' dialog to work for both Chrome / Edge using the experimental `window.showSaveFilePicker()` method! However, please note the following: 
+   - As `window.showSaveFilePicker()` is experimental, it may stop working in the future.
+   - Also, since `window.showSaveFilePicker()` does not allow cross-origin sub frames, you must run SAP BAS / SAP Build Code from its original URL, and not from any custom domain. I.e., run it from `https://theia-workspaces-ws-...cloud.sap` instead of `https://mycompany...cloud.sap`.
+
 ## [1.1.5]
 
 - Found no solution for download flow. Behavior now is the following: 

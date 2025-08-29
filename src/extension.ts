@@ -15,8 +15,7 @@ const logger = vscode.window.createOutputChannel("BASEnvSync", { log: true });
  * @param context 
  */
 export async function activate(context: vscode.ExtensionContext) {
-
-	logger.info('Extension "BASEnvSync" is now active!');
+	console.log('Congratulations, your extension "basenvsync" is now active!');
 
 	await showWhatsNew(context);
 
@@ -36,19 +35,23 @@ async function showWhatsNew(context: vscode.ExtensionContext) {
     // 2. Last version we stored (undefined ⇒ first-ever install)
     const prevVersion = context.globalState.get<string>(EXTENSION_VERSION);
 
-    // 3. Only fire on an *update* (skip first install and downgrades)
-    if (prevVersion && prevVersion !== thisVersion) {
+    // 3. Extract major versions (first number in semver x.y.z format)
+    const thisMajorVersion = parseInt(thisVersion.split('.')[0]);
+    const prevMajorVersion = prevVersion ? parseInt(prevVersion.split('.')[0]) : 0;
+
+    // 4. Only fire when major version increases (skip first install and non-major updates)
+    if (prevVersion && thisMajorVersion > prevMajorVersion) {
+		logger.info('New major version detected:', thisVersion);
+
         // Resolve CHANGELOG.md inside your extension bundle
         const notesUri = vscode.Uri.joinPath(context.extensionUri, RELEASE_NOTES_MD);
-		logger.info('Release notes URL:', notesUri);
+        logger.info('Release notes URL:', notesUri);
 
-        // Either open the raw Markdown…
-        // const doc = await vscode.workspace.openTextDocument(notesUri);
-        // await vscode.window.showTextDocument(doc);
-
-        // …or jump straight to the built-in preview ✨
-        await vscode.commands.executeCommand('markdown.showPreview', notesUri);  // ⇧⌘V shortcut  [oai_citation:0‡Visual Studio Code](https://code.visualstudio.com/docs/reference/default-keybindings?utm_source=chatgpt.com)
-    }
+        // Jump straight to the built-in preview
+        await vscode.commands.executeCommand('markdown.showPreview', notesUri);
+    } else if (prevVersion && thisVersion > prevVersion) {
+		logger.info('No new major version detected, but extension was updated to a new version:', thisVersion);
+	}
 
     // 4. Persist the current version for next time
     await context.globalState.update(EXTENSION_VERSION, thisVersion);
